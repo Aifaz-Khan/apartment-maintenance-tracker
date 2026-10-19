@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.0] - 2026-10-19
+
+### Added
+- **Phase 2: Local PostgreSQL Connection & Migration Foundation**
+  - Dedicated PostgreSQL connection configuration with fallback to application profile
+  - Flyway migration `V1__initial_schema.sql` covering all 11 core domain tables, constraints, foreign keys, and seeded categories
+  - Partial unique indexes enforcing core business invariants:
+    - `uq_active_residency_per_unit` (at most one ACTIVE residency per apartment)
+    - `uq_one_active_complaint_per_apartment` (at most one ACTIVE complaint per apartment)
+  - Complete JPA domain entities with optimistic locking (`@Version`) and corresponding domain enums
+  - Verified Hibernate schema validation (`ddl-auto: validate`) against PostgreSQL
+
 ## [0.1.0] - 2026-10-19
 
 ### Added
