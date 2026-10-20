@@ -1,79 +1,228 @@
-import React from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { fetchCategories } from './categoryService';
-import { Tag, Globe, Building } from 'lucide-react';
+import { fetchCategories, ComplaintCategoryItem } from './categoryService';
+import { Search, X, RefreshCw } from 'lucide-react';
 
 export const CategoryList: React.FC = () => {
-  const { data: categories, isLoading, isError, error } = useQuery({
+  const [filterQuery, setFilterQuery] = useState('');
+  const [scopeFilter, setScopeFilter] = useState<'ALL' | 'GLOBAL' | 'SOCIETY'>('ALL');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: categories, isLoading, isError, error, refetch, isFetching } = useQuery({
     queryKey: ['categories'],
     queryFn: () => fetchCategories(),
   });
 
+  // Keyboard shortcut '/' to instantly focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && document.activeElement !== searchInputRef.current) {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  const filteredCategories = useMemo(() => {
+    if (!categories) return [];
+    return categories.filter((cat: ComplaintCategoryItem) => {
+      const matchesScope =
+        scopeFilter === 'ALL' ||
+        (scopeFilter === 'GLOBAL' && cat.isGlobal) ||
+        (scopeFilter === 'SOCIETY' && !cat.isGlobal);
+
+      const query = filterQuery.trim().toLowerCase();
+      const matchesQuery =
+        query === '' ||
+        cat.name.toLowerCase().includes(query) ||
+        (cat.description && cat.description.toLowerCase().includes(query)) ||
+        cat.id.toString().includes(query);
+
+      return matchesScope && matchesQuery;
+    });
+  }, [categories, filterQuery, scopeFilter]);
+
+  const globalCount = useMemo(() => categories?.filter(c => c.isGlobal).length ?? 0, [categories]);
+  const societyCount = useMemo(() => categories?.filter(c => !c.isGlobal).length ?? 0, [categories]);
+  const totalCount = categories?.length ?? 0;
+
   return (
-    <div className="card" style={{ marginTop: '1.5rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Tag size={20} color="var(--accent-color)" />
-          <h3 style={{ fontSize: '1.15rem' }}>Available Maintenance Categories</h3>
+    <div className="section-panel" style={{ marginTop: '1rem' }}>
+      {/* Panel Action Bar */}
+      <div className="panel-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <h2>Maintenance Categories</h2>
+          <span className="code-inline tnum">
+            {filteredCategories.length} of {totalCount} records
+          </span>
         </div>
-        <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          API: <code>GET /api/v1/categories</code>
-        </span>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <button
+            onClick={() => refetch()}
+            disabled={isFetching}
+            className="btn-tab"
+            title="Refresh categories"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}
+          >
+            <RefreshCw size={12} className={isFetching ? 'spin' : ''} />
+            <span>Sync</span>
+          </button>
+        </div>
       </div>
 
-      {isLoading && (
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          Loading categories from backend...
-        </p>
-      )}
-
-      {isError && (
-        <div style={{ padding: '0.75rem', borderRadius: '0.5rem', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--danger-color)', fontSize: '0.9rem' }}>
-          Failed to load categories: {error instanceof Error ? error.message : 'Unknown error'}
+      {/* Filter & Search Bar */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0.5rem 1rem',
+        borderBottom: '1px solid var(--border-subtle)',
+        backgroundColor: 'var(--bg-app)',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+      }}>
+        {/* Scope Tabs */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <button
+            className={`btn-tab ${scopeFilter === 'ALL' ? 'active' : ''}`}
+            onClick={() => setScopeFilter('ALL')}
+          >
+            All <span className="tnum">({totalCount})</span>
+          </button>
+          <button
+            className={`btn-tab ${scopeFilter === 'GLOBAL' ? 'active' : ''}`}
+            onClick={() => setScopeFilter('GLOBAL')}
+          >
+            Global <span className="tnum">({globalCount})</span>
+          </button>
+          <button
+            className={`btn-tab ${scopeFilter === 'SOCIETY' ? 'active' : ''}`}
+            onClick={() => setScopeFilter('SOCIETY')}
+          >
+            Society Custom <span className="tnum">({societyCount})</span>
+          </button>
         </div>
-      )}
 
-      {!isLoading && !isError && categories && categories.length === 0 && (
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-          No active complaint categories found.
-        </p>
-      )}
-
-      {!isLoading && !isError && categories && categories.length > 0 && (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '0.75rem' }}>
-          {categories.map((cat) => (
-            <div
-              key={cat.id}
+        {/* Search Field */}
+        <div style={{ position: 'relative', width: '260px' }}>
+          <Search size={13} style={{ position: 'absolute', left: '0.5rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)' }} />
+          <input
+            ref={searchInputRef}
+            type="text"
+            className="filter-input"
+            value={filterQuery}
+            onChange={(e) => setFilterQuery(e.target.value)}
+            placeholder="Filter categories... (Press /)"
+            style={{ width: '100%', paddingLeft: '1.75rem', paddingRight: filterQuery ? '1.75rem' : '0.5rem' }}
+          />
+          {filterQuery && (
+            <button
+              onClick={() => setFilterQuery('')}
               style={{
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                position: 'absolute',
+                right: '0.375rem',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                color: 'var(--text-tertiary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                <strong style={{ fontSize: '0.95rem' }}>{cat.name}</strong>
-                <span className={cat.isGlobal ? 'badge badge-info' : 'badge badge-success'} style={{ fontSize: '0.7rem' }}>
-                  {cat.isGlobal ? (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                      <Globe size={11} /> Global
-                    </span>
-                  ) : (
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
-                      <Building size={11} /> Society
-                    </span>
-                  )}
-                </span>
-              </div>
-              {cat.description && (
-                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>
-                  {cat.description}
-                </p>
-              )}
-            </div>
-          ))}
+              <X size={13} />
+            </button>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* Main Data Table */}
+      <div className="data-table-container" style={{ border: 'none', borderRadius: 0 }}>
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th style={{ width: '60px' }}>ID</th>
+              <th style={{ width: '220px' }}>Category Name</th>
+              <th>Description</th>
+              <th style={{ width: '120px' }}>Scope</th>
+              <th style={{ width: '100px', textAlign: 'right' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading && (
+              <>
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <tr key={i}>
+                    <td className="tnum" style={{ color: 'var(--text-tertiary)' }}>---</td>
+                    <td style={{ color: 'var(--text-tertiary)' }}>Loading catalog item...</td>
+                    <td style={{ color: 'var(--text-tertiary)' }}>Fetching metadata from server...</td>
+                    <td><span className="badge badge-neutral">---</span></td>
+                    <td style={{ textAlign: 'right' }}><span className="badge badge-neutral">...</span></td>
+                  </tr>
+                ))}
+              </>
+            )}
+
+            {isError && (
+              <tr>
+                <td colSpan={5} style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--status-warning-text)' }}>
+                  Failed to load categories: {error instanceof Error ? error.message : 'Unknown network error'}.
+                  <button onClick={() => refetch()} className="btn-tab" style={{ marginLeft: '0.5rem', textDecoration: 'underline' }}>
+                    Retry
+                  </button>
+                </td>
+              </tr>
+            )}
+
+            {!isLoading && !isError && filteredCategories.length === 0 && (
+              <tr>
+                <td colSpan={5} style={{ padding: '2.5rem 1rem', textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                  No categories match current filters.
+                  {filterQuery && (
+                    <button
+                      onClick={() => setFilterQuery('')}
+                      className="btn-tab"
+                      style={{ marginLeft: '0.5rem', color: 'var(--accent-color)' }}
+                    >
+                      Clear search
+                    </button>
+                  )}
+                </td>
+              </tr>
+            )}
+
+            {!isLoading && !isError && filteredCategories.map((cat) => (
+              <tr key={cat.id}>
+                <td className="tnum" style={{ color: 'var(--text-tertiary)' }}>
+                  #{String(cat.id).padStart(3, '0')}
+                </td>
+                <td style={{ fontWeight: 500 }}>
+                  {cat.name}
+                </td>
+                <td style={{ color: 'var(--text-secondary)' }}>
+                  {cat.description || '—'}
+                </td>
+                <td>
+                  {cat.isGlobal ? (
+                    <span className="badge badge-neutral">Global Default</span>
+                  ) : (
+                    <span className="badge badge-info tnum">Society #{cat.societyId}</span>
+                  )}
+                </td>
+                <td style={{ textAlign: 'right' }}>
+                  <span className={cat.active ? 'badge badge-success' : 'badge badge-neutral'}>
+                    {cat.active ? 'Active' : 'Archived'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
