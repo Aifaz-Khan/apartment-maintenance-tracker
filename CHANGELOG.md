@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.3.0] - 2026-10-20
+
+### Added
+- **Phase 3: First Vertical Slice (Categories API & Agent Handoff Guide)**
+  - `CategoryRepository` Spring Data JPA repository for global and society-specific category queries
+  - `CategoryService` transactional application service with DTO mapping
+  - `CategoryController` REST controller exposing `GET /api/v1/categories?societyId=...`
+  - `CategoryResponse` DTO with `isGlobal` and `societyId` attributes
+  - Springdoc OpenAPI 2.8.5 integration with Swagger UI at `/swagger-ui.html` and docs at `/v3/api-docs`
+  - Automated unit test `CategoryServiceTest` and WebMvc test `CategoryControllerTest` (100% pass)
+  - Minimal frontend `CategoryList` component integrated into `DashboardView` with loading, error, and empty states
+  - `docs/AGENT_HANDOFF.md` comprehensive context guide for AI agent session continuations
+
 ## [0.2.0] - 2026-10-19
 
 ### Added

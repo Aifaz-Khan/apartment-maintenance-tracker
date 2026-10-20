@@ -1,5 +1,6 @@
 import React from 'react';
 import { Server, Layers, Database, CheckCircle2 } from 'lucide-react';
+import { CategoryList } from '../categories/CategoryList';
 
 export const DashboardView: React.FC = () => {
   return (
@@ -9,7 +10,7 @@ export const DashboardView: React.FC = () => {
           <CheckCircle2 color="var(--success-color)" size={24} /> System Scaffolding Complete
         </h2>
         <p style={{ color: 'var(--text-muted)' }}>
-          Phase 0 architecture specifications and Phase 1 full-stack baseline have been successfully scaffolded and verified.
+          Phase 0 architecture specifications, Phase 1 full-stack baseline, Phase 2 Flyway migration foundation, and Phase 3 vertical slice are operational.
         </p>
       </div>
 
@@ -20,7 +21,7 @@ export const DashboardView: React.FC = () => {
             <h3 style={{ fontSize: '1.1rem' }}>Backend Baseline</h3>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-            Spring Boot 3.5.16 on Java 21 LTS with Maven Wrapper, Spring Data JPA, and Flyway.
+            Spring Boot 3.5.16 on Java 21 LTS with OpenAPI Swagger docs and REST controllers.
           </p>
           <span className="badge badge-success">Verified Healthy</span>
         </div>
@@ -31,7 +32,7 @@ export const DashboardView: React.FC = () => {
             <h3 style={{ fontSize: '1.1rem' }}>Database Architecture</h3>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-            PostgreSQL 16/17 connected with partial unique indexes for single active residency and complaint invariants.
+            PostgreSQL 17/18 schema migrated with Flyway V1 and partial unique index invariants.
           </p>
           <span className="badge badge-success">Local DB Ready</span>
         </div>
@@ -42,11 +43,13 @@ export const DashboardView: React.FC = () => {
             <h3 style={{ fontSize: '1.1rem' }}>Frontend Client</h3>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-            React 19 + TypeScript SPA bundled with Vite, TanStack Query, and feature-based structure.
+            React 19 + TypeScript SPA bundled with Vite and TanStack Query data fetching.
           </p>
           <span className="badge badge-success">Strict Mode Enabled</span>
         </div>
       </div>
+
+      <CategoryList />
     </div>
   );
 };
