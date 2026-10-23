@@ -40,6 +40,26 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @ExceptionHandler(com.example.maintenance.society.application.ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(
+            com.example.maintenance.society.application.ResourceNotFoundException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.NOT_FOUND.value(), "RESOURCE_NOT_FOUND", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
+    @ExceptionHandler(com.example.maintenance.society.application.ResourceConflictException.class)
+    public ResponseEntity<ErrorResponse> handleResourceConflict(
+            com.example.maintenance.society.application.ResourceConflictException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.CONFLICT.value(), "RESOURCE_CONFLICT", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "INVALID_REQUEST", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(
             Exception ex,

@@ -2,11 +2,13 @@ import React from 'react';
 import { CategoryList } from '../categories/CategoryList';
 import { Check, ShieldAlert, Cpu, Database, Code, BookOpen } from 'lucide-react';
 import { AuthPanel } from '../auth/AuthPanel';
+import { SocietyManagementPanel } from '../societies/SocietyManagementPanel';
 
 export const DashboardView: React.FC = () => {
   return (
     <div className="main-content">
       <AuthPanel />
+      <SocietyManagementPanel />
       {/* Dense System Metric Strip (Borders & Spacing, No Cards) */}
       <div style={{
         display: 'grid',

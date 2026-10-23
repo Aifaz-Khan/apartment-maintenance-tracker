@@ -95,7 +95,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 2 — Database Connection & Migration Foundation**: PostgreSQL connected, `maintenance_app` user, `V1__initial_schema.sql` applied, 11 JPA domain entities created, partial unique indexes active, Hibernate `validate` passing.
 - [x] **Phase 3 — First Vertical Slice**: Complaint Categories (`GET /api/v1/categories`), DTOs, OpenAPI documentation, unit & controller tests, minimal UI component.
 - [x] **Phase 4 — Authentication & Security Foundation**: Spring Security 6, JWT token issuance, password hashing, `POST /api/v1/auth/login`, `GET /api/v1/users/me`, role authorization, Super Admin bootstrap.
-- [ ] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
+- [x] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
 - [ ] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
 - [ ] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
 - [ ] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
@@ -106,6 +106,13 @@ apartment-maintenance-tracker/
 - [ ] **Phase 13 — Hardening & Comprehensive Tests**: Integration test suite, Testcontainers.
 - [ ] **Phase 14 — CI/CD & Cloud Deployment**: GitHub Actions, Neon PostgreSQL, Vercel & Render.
 
+
+
+### Phase 5 Society Management & Tenant Scope
+- Super Admin APIs at `/api/v1/super-admin/societies` provide paginated list, detail, create, partial update/status control, and Society Admin appointment. All routes require `ROLE_SUPER_ADMIN`.
+- Admin appointment creates a BCrypt protected `SOCIETY_ADMIN` account and a `society_admins` mapping in one transaction; duplicate account emails are rejected. Initial credentials are supplied through the protected Super Admin route and must be shared securely. Email invitation delivery is deferred to Phase 10.
+- `SocietyAccessService` resolves a Society Admin's assigned society from the authenticated user mapping and rejects any mismatched society ID. Future tenant-owned endpoints should use this service for all reads and writes.
+- Deactivation sets society status to `INACTIVE`; it preserves society data and assignments.
 
 ### Phase 4 Authentication & Security
 - JWT access tokens are HS256, issued and validated through Spring Security Nimbus support, with issuer `maintenance-tracker` and 86400 second default expiration. Configure `JWT_SECRET` with at least 32 bytes in deployed environments.

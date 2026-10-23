@@ -69,16 +69,19 @@ Response structure:
   - Requires Auth. Returns user profile, role, and active residency / society context.
 
 ### 3.2 Super Admin: Societies & Society Admins
+All endpoints in this section require `SUPER_ADMIN` authority. Society admin account creation is controlled by the platform; callers cannot choose the assigned role.
 - `POST /api/v1/super-admin/societies`
-  - Creates a new housing society. Role: `SUPER_ADMIN`.
-- `GET /api/v1/super-admin/societies`
-  - Paginated list of societies. Role: `SUPER_ADMIN`.
+  - Creates a new housing society. Required fields: name, code, addressLine1, city, state, postalCode, contactEmail. Returns 201.
+- `GET /api/v1/super-admin/societies?page=0&size=20`
+  - Paginated list of societies (size 1–100).
 - `GET /api/v1/super-admin/societies/{id}`
-  - Detail view. Role: `SUPER_ADMIN`.
+  - Detail view.
 - `PATCH /api/v1/super-admin/societies/{id}`
-  - Update status/details. Role: `SUPER_ADMIN`.
+  - Partial update of society details or `status` (`ACTIVE` / `INACTIVE`).
 - `POST /api/v1/super-admin/societies/{id}/admins`
-  - Appoint / invite a Society Admin for the society. Role: `SUPER_ADMIN`.
+  - Creates and assigns a Society Admin account. Required fields: email, fullName, initialPassword (12–72 characters); optional phone. Email must be unused. The Super Admin shares the initial password securely; automated email invitations are deferred to Phase 10.
+
+Society Admin scope is resolved through the authenticated user ID and the `society_admins` mapping. `SocietyAccessService` provides the server-side scope check used by subsequent society-owned APIs; client-supplied society IDs are not trusted as authorization context.
 
 ### 3.3 Society Admin: Buildings & Units
 - `GET /api/v1/societies/{societyId}/units`

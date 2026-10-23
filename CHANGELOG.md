@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.5.0] - 2026-10-23
+
+### Added
+- **Phase 5: Society & Society Admin Management**
+  - Super Admin secured society create, paginated list, detail, update, deactivation, and admin appointment APIs
+  - Server-side Society Admin tenant scope resolver
+  - Dashboard society management interface for creation, activation control, and admin account appointment
+
 ## [0.4.0] - 2026-10-23
 
 ### Added
