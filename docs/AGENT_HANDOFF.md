@@ -94,7 +94,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 1 — Repository Scaffolding & Builds**: Spring Boot 3.5.16 + React 19 + TypeScript baseline with clean builds.
 - [x] **Phase 2 — Database Connection & Migration Foundation**: PostgreSQL connected, `maintenance_app` user, `V1__initial_schema.sql` applied, 11 JPA domain entities created, partial unique indexes active, Hibernate `validate` passing.
 - [x] **Phase 3 — First Vertical Slice**: Complaint Categories (`GET /api/v1/categories`), DTOs, OpenAPI documentation, unit & controller tests, minimal UI component.
-- [ ] **Phase 4 — Authentication & Security Foundation**: Spring Security 6, JWT token issuance, password hashing, `POST /api/v1/auth/login`, `GET /api/v1/users/me`, role authorization, Super Admin bootstrap.
+- [x] **Phase 4 — Authentication & Security Foundation**: Spring Security 6, JWT token issuance, password hashing, `POST /api/v1/auth/login`, `GET /api/v1/users/me`, role authorization, Super Admin bootstrap.
 - [ ] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
 - [ ] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
 - [ ] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
@@ -105,6 +105,14 @@ apartment-maintenance-tracker/
 - [ ] **Phase 12 — Comments, Reopening, Dashboards & Reports**: Complaint discussion, reopening window, society-scoped metrics.
 - [ ] **Phase 13 — Hardening & Comprehensive Tests**: Integration test suite, Testcontainers.
 - [ ] **Phase 14 — CI/CD & Cloud Deployment**: GitHub Actions, Neon PostgreSQL, Vercel & Render.
+
+
+### Phase 4 Authentication & Security
+- JWT access tokens are HS256, issued and validated through Spring Security Nimbus support, with issuer `maintenance-tracker` and 86400 second default expiration. Configure `JWT_SECRET` with at least 32 bytes in deployed environments.
+- `POST /api/v1/auth/login` is public and returns a generic `INVALID_CREDENTIALS` response for invalid, missing, or inactive accounts. `GET /api/v1/users/me` requires a valid bearer token.
+- Passwords use BCrypt. Roles come from controlled database account creation and token role claims map to `ROLE_<ROLE>`. Public endpoints cannot assign roles.
+- The startup runner seeds a Super Admin only if none exists, using `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD`. Local fallback: `superadmin@maintenancetracker.com` / `Admin@12345`; override these outside local development.
+- CORS origins are configured through `CORS_ALLOWED_ORIGINS` (defaults to localhost ports 5173 and 3000).
 
 ---
 

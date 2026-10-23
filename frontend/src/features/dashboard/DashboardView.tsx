@@ -1,10 +1,12 @@
 import React from 'react';
 import { CategoryList } from '../categories/CategoryList';
 import { Check, ShieldAlert, Cpu, Database, Code, BookOpen } from 'lucide-react';
+import { AuthPanel } from '../auth/AuthPanel';
 
 export const DashboardView: React.FC = () => {
   return (
     <div className="main-content">
+      <AuthPanel />
       {/* Dense System Metric Strip (Borders & Spacing, No Cards) */}
       <div style={{
         display: 'grid',
@@ -90,7 +92,7 @@ export const DashboardView: React.FC = () => {
               <BookOpen size={14} color="var(--accent-color)" />
               <h3>Phase Execution State</h3>
             </div>
-            <span className="badge badge-info tnum">Phases 0–3</span>
+            <span className="badge badge-info tnum">Phases 0–4</span>
           </div>
 
           <div style={{ padding: '0.875rem 1rem' }}>

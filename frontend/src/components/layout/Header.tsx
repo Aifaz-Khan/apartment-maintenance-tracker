@@ -1,7 +1,9 @@
 import React from 'react';
+import { useAuth } from '../../features/auth/useAuth';
 import { Building2, Database, Server, FileCode, Check } from 'lucide-react';
 
 export const Header: React.FC = () => {
+  const { user, logout, loading } = useAuth();
   return (
     <header style={{
       borderBottom: '1px solid var(--border-subtle)',
@@ -70,6 +72,13 @@ export const Header: React.FC = () => {
             </span>
           </div>
 
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem' }}>
+            {loading ? <span style={{ color: 'var(--text-tertiary)' }}>Checking session…</span> : user ? <>
+              <span className="badge badge-success">{user.role.replace('_', ' ')}</span>
+              <span style={{ color: 'var(--text-secondary)' }}>{user.email}</span>
+              <button type="button" className="auth-button auth-button-quiet" onClick={logout}>Sign out</button>
+            </> : <span className="badge badge-neutral">Not authenticated</span>}
+          </div>
           <a
             href="http://localhost:8080/swagger-ui.html"
             target="_blank"

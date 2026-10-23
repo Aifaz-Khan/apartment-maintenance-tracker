@@ -21,8 +21,12 @@ export interface UserSummary {
   email: string;
   fullName: string;
   role: UserRole;
-  societyId?: number;
-  apartmentUnitId?: number;
+  phone?: string | null;
+  societyId?: number | null;
+  societyName?: string | null;
+  apartmentUnitId?: number | null;
+  unitNumber?: string | null;
+  buildingName?: string | null;
 }
 
 export interface ApiErrorResponse {

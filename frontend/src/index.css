@@ -254,3 +254,21 @@ a:hover {
   background-color: var(--bg-subtle);
   border-color: var(--border-medium);
 }
+
+.auth-button {
+  border: 1px solid var(--border-medium);
+  border-radius: 3px;
+  padding: 0.4rem 0.75rem;
+  background: var(--accent-color);
+  color: var(--text-inverted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.auth-button:disabled { opacity: 0.6; cursor: wait; }
+.auth-button-quiet { background: transparent; color: var(--text-secondary); }
+.auth-button:focus-visible, .auth-input:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 2px; }
+.auth-input { min-width: 0; width: 100%; background: var(--bg-app); border: 1px solid var(--border-medium); border-radius: 3px; color: var(--text-primary); padding: 0.45rem 0.625rem; font: inherit; }
+.auth-panel { border: 1px solid var(--border-subtle); background: var(--bg-surface); border-radius: 4px; margin-bottom: 1rem; }
+.auth-panel-body { padding: 0.875rem 1rem; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+@media (max-width: 760px) { .auth-panel-body { grid-template-columns: 1fr; } }

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.4.0] - 2026-10-23
+
+### Added
+- **Phase 4: Authentication & Security Foundation**
+  - Stateless Spring Security 6 OAuth2 Resource Server JWT validation and HS256 token issuance with 24-hour default expiry
+  - BCrypt password hashing, generic invalid credential responses, and environment configurable Super Admin bootstrap
+  - Public login endpoint, protected current-user endpoint, role claim authority mapping, explicit CORS origins, and JSON 401/403 responses
+  - Frontend sign in, session profile, active-user header badge, and sign out controls
+
 ## [0.3.0] - 2026-10-20
 
 ### Added

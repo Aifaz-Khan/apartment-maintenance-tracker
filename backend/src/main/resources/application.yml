@@ -33,3 +33,15 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operations-sorter: method
+
+app:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:local-development-jwt-signing-key-change-before-deploy-32chars}
+      issuer: maintenance-tracker
+      expiration-seconds: ${JWT_EXPIRATION_SECONDS:86400}
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+  superadmin:
+    email: ${SUPERADMIN_EMAIL:superadmin@maintenancetracker.com}
+    password: ${SUPERADMIN_PASSWORD:Admin@12345}
