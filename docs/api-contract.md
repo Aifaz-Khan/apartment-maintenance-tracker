@@ -84,18 +84,18 @@ All endpoints in this section require `SUPER_ADMIN` authority. Society admin acc
 Society Admin scope is resolved through the authenticated user ID and the `society_admins` mapping. `SocietyAccessService` provides the server-side scope check used by subsequent society-owned APIs; client-supplied society IDs are not trusted as authorization context.
 
 ### 3.3 Society Admin: Buildings & Units
-- `GET /api/v1/societies/{societyId}/units`
-  - Paginated list of apartment units in the caller's society. Role: `SOCIETY_ADMIN`.
+- `GET /api/v1/societies/{societyId}/units?page=0&size=20`
+  - Paginated list of apartment units. Role: `SOCIETY_ADMIN`; society ID must match the authenticated admin's assignment.
 - `POST /api/v1/societies/{societyId}/units`
-  - Create a new apartment unit in the caller's society. Role: `SOCIETY_ADMIN`.
+  - Body: `{ "buildingName": "A", "unitNumber": "101", "floorNumber": 1, "unitLabel": "optional" }`. Creates a unit in the caller's assigned society. Duplicate building/unit pairs return 409.
 
 ### 3.4 Resident Onboarding & Residencies
 - `POST /api/v1/auth/resident-registration-requests`
-  - Public registration request by resident for a specified society and unit.
-- `GET /api/v1/admin/resident-requests`
-  - List pending resident verification requests. Role: `SOCIETY_ADMIN` (own society).
+  - Public request body: `{ "societyId": 1, "apartmentUnitId": 2, "email": "...", "password": "12+ chars", "fullName": "...", "phone": "optional", "residencyType": "OWNER_OCCUPIED|TENANT|AUTHORIZED_OCCUPANT" }`. Creates an inactive resident account and PENDING residency; successful response is 201.
+- `GET /api/v1/admin/resident-requests?page=0&size=20`
+  - Lists pending requests only for the authenticated Society Admin's assigned society.
 - `PATCH /api/v1/admin/resident-requests/{id}`
-  - Body: `{ "action": "APPROVE" | "REJECT", "rejectionReason": "..." }`. Role: `SOCIETY_ADMIN`.
+  - Body: `{ "action": "APPROVE" | "REJECT", "rejectionReason": "required when rejecting" }`. Approval activates the account and residency; a unit with an existing active residency cannot be approved. Role: `SOCIETY_ADMIN`; request's society is checked server-side.
 - `POST /api/v1/residency-transfers`
   - Initiate residency transfer request. Role: `RESIDENT` or `SOCIETY_ADMIN`.
 - `GET /api/v1/admin/residency-transfers`

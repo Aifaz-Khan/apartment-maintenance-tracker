@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.6.0] - 2026-10-26
+
+### Added
+- **Phase 6: Units & Resident Onboarding**
+  - Society Admin unit listing and creation with server-side society boundary checks
+  - Public resident registration requests with inactive accounts and pending residencies
+  - Society Admin approval/rejection workflow, account activation, and active-residency enforcement
+  - Simple dashboard forms for units, resident review, and public access requests
+
+### Changed
+- Removed infrastructure stack/version labels from the frontend header and dashboard
+
 ## [0.5.0] - 2026-10-23
 
 ### Added

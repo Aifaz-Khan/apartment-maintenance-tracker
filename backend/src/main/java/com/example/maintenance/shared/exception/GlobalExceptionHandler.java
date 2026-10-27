@@ -40,6 +40,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleForbidden(org.springframework.security.access.AccessDeniedException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "FORBIDDEN", "You do not have permission to access this resource.", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+    }
+
     @ExceptionHandler(com.example.maintenance.society.application.ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFound(
             com.example.maintenance.society.application.ResourceNotFoundException ex, HttpServletRequest request) {
@@ -51,6 +57,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceConflict(
             com.example.maintenance.society.application.ResourceConflictException ex, HttpServletRequest request) {
         ErrorResponse response = new ErrorResponse(HttpStatus.CONFLICT.value(), "RESOURCE_CONFLICT", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataConflict(org.springframework.dao.DataIntegrityViolationException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.CONFLICT.value(), "RESOURCE_CONFLICT", "The requested change conflicts with existing data.", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 

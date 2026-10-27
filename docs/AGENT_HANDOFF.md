@@ -96,7 +96,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 3 — First Vertical Slice**: Complaint Categories (`GET /api/v1/categories`), DTOs, OpenAPI documentation, unit & controller tests, minimal UI component.
 - [x] **Phase 4 — Authentication & Security Foundation**: Spring Security 6, JWT token issuance, password hashing, `POST /api/v1/auth/login`, `GET /api/v1/users/me`, role authorization, Super Admin bootstrap.
 - [x] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
-- [ ] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
+- [x] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
 - [ ] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
 - [ ] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
 - [ ] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/size validation, authorized streaming.
@@ -107,6 +107,13 @@ apartment-maintenance-tracker/
 - [ ] **Phase 14 — CI/CD & Cloud Deployment**: GitHub Actions, Neon PostgreSQL, Vercel & Render.
 
 
+
+
+### Phase 6 Units & Resident Verification
+- Society Admin unit routes require `SOCIETY_ADMIN` and compare the path society ID with the assigned society from `society_admins`; the client cannot select another tenant.
+- Public registration creates a BCrypt password hash, an inactive `RESIDENT` user and a `PENDING` `UnitResidency`. The requested unit must belong to the stated active society.
+- Pending requests are listed and reviewed within the current admin's assigned society. Approval activates the user, marks residency ACTIVE and records verifier/time; rejection requires a reason and leaves the account inactive. The existing partial unique index prevents multiple active residencies per unit.
+- No database migration was needed: V1 already contains apartment units, pending residency statuses, and the active-residency uniqueness index.
 
 ### Phase 5 Society Management & Tenant Scope
 - Super Admin APIs at `/api/v1/super-admin/societies` provide paginated list, detail, create, partial update/status control, and Society Admin appointment. All routes require `ROLE_SUPER_ADMIN`.

@@ -16,7 +16,7 @@ public class SecurityConfig {
  @Bean SecurityFilterChain securityFilterChain(HttpSecurity http, JwtDecoder decoder, org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter converter, CustomAuthenticationEntryPoint entry, CustomAccessDeniedHandler denied) throws Exception {
   return http.csrf(c->c.disable()).cors(c->{}).sessionManagement(s->s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
    .exceptionHandling(e->e.authenticationEntryPoint(entry).accessDeniedHandler(denied))
-   .authorizeHttpRequests(a->a.requestMatchers(HttpMethod.POST,"/api/v1/auth/login").permitAll().requestMatchers(HttpMethod.GET,"/api/v1/categories").permitAll().requestMatchers("/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**","/actuator/health").permitAll().requestMatchers("/api/v1/**").authenticated().anyRequest().permitAll())
+   .authorizeHttpRequests(a->a.requestMatchers(HttpMethod.POST,"/api/v1/auth/login","/api/v1/auth/resident-registration-requests").permitAll().requestMatchers(HttpMethod.GET,"/api/v1/categories").permitAll().requestMatchers("/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**","/actuator/health").permitAll().requestMatchers("/api/v1/**").authenticated().anyRequest().permitAll())
    .oauth2ResourceServer(o->o.jwt(j->j.decoder(decoder).jwtAuthenticationConverter(converter)).authenticationEntryPoint(entry)).build();
  }
  @Bean CorsConfigurationSource corsConfigurationSource(@Value("${app.cors.allowed-origins}") String origins) {

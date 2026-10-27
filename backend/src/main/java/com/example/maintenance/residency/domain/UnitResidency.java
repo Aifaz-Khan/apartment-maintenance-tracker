@@ -36,6 +36,9 @@ public class UnitResidency {
     @Column(name = "status", nullable = false, length = 20)
     private ResidencyStatus status;
 
+    @Column(name = "rejection_reason", columnDefinition = "TEXT")
+    private String rejectionReason;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "verified_by")
     private User verifiedBy;
@@ -123,6 +126,10 @@ public class UnitResidency {
     public void setStatus(ResidencyStatus status) {
         this.status = status;
     }
+
+    public String getRejectionReason() { return rejectionReason; }
+
+    public void setRejectionReason(String rejectionReason) { this.rejectionReason = rejectionReason; }
 
     public User getVerifiedBy() {
         return verifiedBy;
