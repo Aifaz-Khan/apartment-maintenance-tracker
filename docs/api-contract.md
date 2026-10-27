@@ -111,8 +111,9 @@ Society Admin scope is resolved through the authenticated user ID and the `socie
 
 ### 3.6 Complaints
 - `POST /api/v1/complaints`
-  - Lodges a new complaint for caller's active apartment unit. Role: `RESIDENT`.
-  - Rejection if active complaint exists: `409 ACTIVE_COMPLAINT_EXISTS`.
+  - Role: `RESIDENT`. Body: `{ "categoryId": 1, "title": "...", "description": "...", "locationArea": "...", "locationDetails": "optional", "priority": "LOW|MEDIUM|HIGH|URGENT" }`.
+  - The server derives the resident, active unit, and society from the authenticated user and active residency; the body cannot set those IDs. Categories must be active and global or belong to the resident's society.
+  - Returns 201 with the submitted complaint. If an active complaint already exists for that apartment: `409 ACTIVE_COMPLAINT_EXISTS`.
 - `GET /api/v1/complaints`
   - List complaints. Scoped: `RESIDENT` sees their active unit; `SOCIETY_ADMIN` sees their society.
 - `GET /api/v1/complaints/{id}`

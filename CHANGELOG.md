@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.7.0] - 2026-10-27
+
+### Added
+- **Phase 7: Resident Complaint Submission**
+  - Resident-only complaint creation using server-resolved user, active unit, and society context
+  - Category ownership validation and duplicate active complaint conflicts (`409 ACTIVE_COMPLAINT_EXISTS`)
+  - Simple resident complaint form with priority and location details
+
 ## [0.6.0] - 2026-10-26
 
 ### Added

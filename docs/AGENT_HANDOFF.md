@@ -97,7 +97,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 4 — Authentication & Security Foundation**: Spring Security 6, JWT token issuance, password hashing, `POST /api/v1/auth/login`, `GET /api/v1/users/me`, role authorization, Super Admin bootstrap.
 - [x] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
 - [x] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
-- [ ] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
+- [x] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
 - [ ] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
 - [ ] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/size validation, authorized streaming.
 - [ ] **Phase 10 — Email Notifications**: Society Admin email dispatcher on complaint submission.
@@ -108,6 +108,13 @@ apartment-maintenance-tracker/
 
 
 
+
+
+### Phase 7 Complaint Submission
+- `POST /api/v1/complaints` is resident-only. The service derives resident, active residency, unit, and society from the authenticated subject and does not accept client-supplied tenant/unit/user IDs.
+- Complaint category must be active and either global or scoped to the resident's society.
+- Application checks active complaints before insert; PostgreSQL partial unique index `uq_one_active_complaint_per_apartment` is the concurrency backstop. Both paths return `409 ACTIVE_COMPLAINT_EXISTS`.
+- The active statuses match the index: SUBMITTED, ACKNOWLEDGED, IN_PROGRESS, ON_HOLD, RESOLVED, REOPENED. CLOSED and CANCELLED allow a later submission.
 
 ### Phase 6 Units & Resident Verification
 - Society Admin unit routes require `SOCIETY_ADMIN` and compare the path society ID with the assigned society from `society_admins`; the client cannot select another tenant.

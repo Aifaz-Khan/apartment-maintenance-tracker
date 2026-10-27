@@ -300,3 +300,9 @@ a:hover {
 .unit-list p { color:var(--text-secondary); }
 .resident-request-row { display:flex; flex-basis:100%; justify-content:space-between; align-items:center; gap:.75rem; padding:.5rem 0; border-bottom:1px solid var(--border-subtle); }
 @media(max-width:650px){.app-header{padding:.625rem .8rem}.app-header-inner{align-items:flex-start;flex-direction:column}.resident-request-row{align-items:flex-start;flex-direction:column}}
+.complaint-form { grid-template-columns:repeat(2,minmax(0,1fr)); }
+.complaint-form label { display:grid; gap:.25rem; color:var(--text-secondary); font-size:.72rem; }
+.complaint-wide { grid-column:1/-1; }
+.complaint-form textarea { resize:vertical; min-height:5rem; }
+.complaint-form button { justify-self:start; }
+@media(max-width:600px){.complaint-form{grid-template-columns:1fr}.complaint-wide{grid-column:auto}}

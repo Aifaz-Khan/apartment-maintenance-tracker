@@ -40,6 +40,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
+    @ExceptionHandler(com.example.maintenance.complaint.application.ActiveComplaintExistsException.class)
+    public ResponseEntity<ErrorResponse> handleActiveComplaintExists(
+            com.example.maintenance.complaint.application.ActiveComplaintExistsException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.CONFLICT.value(), "ACTIVE_COMPLAINT_EXISTS", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
     @ExceptionHandler(org.springframework.security.access.AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleForbidden(org.springframework.security.access.AccessDeniedException ex, HttpServletRequest request) {
         ErrorResponse response = new ErrorResponse(HttpStatus.FORBIDDEN.value(), "FORBIDDEN", "You do not have permission to access this resource.", request.getRequestURI());
