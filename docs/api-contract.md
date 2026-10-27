@@ -115,15 +115,16 @@ Society Admin scope is resolved through the authenticated user ID and the `socie
   - The server derives the resident, active unit, and society from the authenticated user and active residency; the body cannot set those IDs. Categories must be active and global or belong to the resident's society.
   - Returns 201 with the submitted complaint. If an active complaint already exists for that apartment: `409 ACTIVE_COMPLAINT_EXISTS`.
 - `GET /api/v1/complaints`
-  - List complaints. Scoped: `RESIDENT` sees their active unit; `SOCIETY_ADMIN` sees their society.
+  - Paginated list (`page`, `size`). Scoped: `RESIDENT` sees their active unit; `SOCIETY_ADMIN` sees their society.
 - `GET /api/v1/complaints/{id}`
   - Get complaint detail.
 - `PATCH /api/v1/complaints/{id}/status`
-  - Body: `{ "newStatus": "...", "remarks": "...", "resolutionNotes": "..." }`. Role: `SOCIETY_ADMIN`.
+  - Body: `{ "newStatus": "ACKNOWLEDGED|IN_PROGRESS|ON_HOLD|RESOLVED|CLOSED|CANCELLED", "remarks": "optional", "resolutionNotes": "required when resolving" }`. Role: `SOCIETY_ADMIN`; society ownership is verified by the server. Invalid transitions return `409 INVALID_STATUS_TRANSITION`.
+  - Allowed transitions: `SUBMITTED → ACKNOWLEDGED|CANCELLED`; `ACKNOWLEDGED → IN_PROGRESS|ON_HOLD|CANCELLED`; `IN_PROGRESS → ON_HOLD|RESOLVED|CANCELLED`; `ON_HOLD → IN_PROGRESS|RESOLVED|CANCELLED`; `RESOLVED → CLOSED`; `REOPENED → ACKNOWLEDGED|IN_PROGRESS|ON_HOLD|RESOLVED`. `CLOSED` and `CANCELLED` are terminal.
 - `POST /api/v1/complaints/{id}/reopen-requests`
   - Body: `{ "reason": "..." }`. Role: `RESIDENT`.
 - `GET /api/v1/complaints/{id}/history`
-  - Audit trail of status transitions.
+  - Audit trail of status transitions, visible only to a resident assigned to the complaint's unit or a Society Admin assigned to its society. New complaints receive an initial `SUBMITTED` history entry.
 - `GET /api/v1/complaints/{id}/comments`
   - List discussion comments.
 - `POST /api/v1/complaints/{id}/comments`

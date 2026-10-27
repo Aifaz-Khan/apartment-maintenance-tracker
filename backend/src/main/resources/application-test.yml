@@ -22,6 +22,8 @@ app:
   cors:
     allowed-origins: http://localhost:5173,http://localhost:3000
   superadmin:
+    bootstrap:
+      enabled: false
     email: test-admin@example.com
     password: TestAdmin@12345
 

@@ -43,5 +43,7 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
   superadmin:
+    bootstrap:
+      enabled: ${SUPERADMIN_BOOTSTRAP_ENABLED:true}
     email: ${SUPERADMIN_EMAIL:superadmin@maintenancetracker.com}
     password: ${SUPERADMIN_PASSWORD:Admin@12345}

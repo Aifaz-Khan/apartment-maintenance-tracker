@@ -32,12 +32,25 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleUnreadableRequest(org.springframework.http.converter.HttpMessageNotReadableException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "INVALID_REQUEST", "Request body contains invalid or malformed values.", request.getRequestURI());
+        return ResponseEntity.badRequest().body(response);
+    }
+
     @ExceptionHandler(com.example.maintenance.auth.application.InvalidCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleInvalidCredentials(
             com.example.maintenance.auth.application.InvalidCredentialsException ex, HttpServletRequest request) {
         ErrorResponse response = new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "INVALID_CREDENTIALS",
                 "Invalid email or password.", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
+    @ExceptionHandler(com.example.maintenance.complaint.application.InvalidStatusTransitionException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidStatusTransition(
+            com.example.maintenance.complaint.application.InvalidStatusTransitionException ex, HttpServletRequest request) {
+        ErrorResponse response = new ErrorResponse(HttpStatus.CONFLICT.value(), "INVALID_STATUS_TRANSITION", ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
     }
 
     @ExceptionHandler(com.example.maintenance.complaint.application.ActiveComplaintExistsException.class)

@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.8.0] - 2026-10-27
+
+### Added
+- **Phase 8: Complaint Management & Status History**
+  - Resident and assigned Society Admin complaint lists, with tenant-scoped detail and history access
+  - Society Admin complaint status updates with enforced transitions and required resolution notes
+  - Status audit history for submission and every administrative transition
+  - Simple complaint management panel for status updates and history review
+
 ## [0.7.0] - 2026-10-27
 
 ### Added

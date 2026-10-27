@@ -98,7 +98,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 5 — Society & Society Admin Management**: Super Admin society CRUD, Society Admin appointments, tenant isolation checks.
 - [x] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
 - [x] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
-- [ ] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
+- [x] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
 - [ ] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/size validation, authorized streaming.
 - [ ] **Phase 10 — Email Notifications**: Society Admin email dispatcher on complaint submission.
 - [ ] **Phase 11 — Residency Transfer Workflow**: Residency transfer request, admin atomic approval.
@@ -116,6 +116,12 @@ apartment-maintenance-tracker/
 - Application checks active complaints before insert; PostgreSQL partial unique index `uq_one_active_complaint_per_apartment` is the concurrency backstop. Both paths return `409 ACTIVE_COMPLAINT_EXISTS`.
 - The active statuses match the index: SUBMITTED, ACKNOWLEDGED, IN_PROGRESS, ON_HOLD, RESOLVED, REOPENED. CLOSED and CANCELLED allow a later submission.
 
+### Phase 8 Complaint Management & Status History
+- Complaint lists are paginated and scoped to the resident's active unit or the Society Admin's assigned society. Detail and history reads enforce the same scope.
+- Society Admin status updates use an explicit transition map; `CLOSED` and `CANCELLED` are terminal. Resolving requires resolution notes, and every change records actor, previous/new status, remarks and timestamp.
+- New complaint creation records an initial `SUBMITTED` history item. No migration was needed because V1 already includes status-history and resolution fields.
+- The dashboard shows residents their requests and history; assigned Society Admins can update status and review history.
+
 ### Phase 6 Units & Resident Verification
 - Society Admin unit routes require `SOCIETY_ADMIN` and compare the path society ID with the assigned society from `society_admins`; the client cannot select another tenant.
 - Public registration creates a BCrypt password hash, an inactive `RESIDENT` user and a `PENDING` `UnitResidency`. The requested unit must belong to the stated active society.
@@ -132,7 +138,7 @@ apartment-maintenance-tracker/
 - JWT access tokens are HS256, issued and validated through Spring Security Nimbus support, with issuer `maintenance-tracker` and 86400 second default expiration. Configure `JWT_SECRET` with at least 32 bytes in deployed environments.
 - `POST /api/v1/auth/login` is public and returns a generic `INVALID_CREDENTIALS` response for invalid, missing, or inactive accounts. `GET /api/v1/users/me` requires a valid bearer token.
 - Passwords use BCrypt. Roles come from controlled database account creation and token role claims map to `ROLE_<ROLE>`. Public endpoints cannot assign roles.
-- The startup runner seeds a Super Admin only if none exists, using `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD`. Local fallback: `superadmin@maintenancetracker.com` / `Admin@12345`; override these outside local development.
+- The startup runner seeds a Super Admin only if none exists, using `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD`; set `SUPERADMIN_BOOTSTRAP_ENABLED=false` to disable seeding. Test profile disables bootstrap to avoid creating test credentials in a shared local database. Local fallback: `superadmin@maintenancetracker.com` / `Admin@12345`; override these outside local development.
 - CORS origins are configured through `CORS_ALLOWED_ORIGINS` (defaults to localhost ports 5173 and 3000).
 
 ---
