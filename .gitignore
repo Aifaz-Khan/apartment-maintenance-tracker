@@ -56,3 +56,4 @@ uploads/
 storage/
 *.log
 logs/
+var/private-attachments/

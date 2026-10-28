@@ -79,7 +79,7 @@ All endpoints in this section require `SUPER_ADMIN` authority. Society admin acc
 - `PATCH /api/v1/super-admin/societies/{id}`
   - Partial update of society details or `status` (`ACTIVE` / `INACTIVE`).
 - `POST /api/v1/super-admin/societies/{id}/admins`
-  - Creates and assigns a Society Admin account. Required fields: email, fullName, initialPassword (12–72 characters); optional phone. Email must be unused. The Super Admin shares the initial password securely; automated email invitations are deferred to Phase 10.
+  - Creates and assigns a Society Admin account. Required fields: email, fullName, initialPassword (12–72 characters); optional phone. Email must be unused. The Super Admin shares the initial password securely; account passwords are not sent by email.
 
 Society Admin scope is resolved through the authenticated user ID and the `society_admins` mapping. `SocietyAccessService` provides the server-side scope check used by subsequent society-owned APIs; client-supplied society IDs are not trusted as authorization context.
 
@@ -114,6 +114,7 @@ Society Admin scope is resolved through the authenticated user ID and the `socie
   - Role: `RESIDENT`. Body: `{ "categoryId": 1, "title": "...", "description": "...", "locationArea": "...", "locationDetails": "optional", "priority": "LOW|MEDIUM|HIGH|URGENT" }`.
   - The server derives the resident, active unit, and society from the authenticated user and active residency; the body cannot set those IDs. Categories must be active and global or belong to the resident's society.
   - Returns 201 with the submitted complaint. If an active complaint already exists for that apartment: `409 ACTIVE_COMPLAINT_EXISTS`.
+  - When `EMAIL_NOTIFICATIONS_ENABLED=true`, an email is sent asynchronously after commit to each active Society Admin assigned to the complaint's society. SMTP delivery failures are logged and do not undo complaint submission.
 - `GET /api/v1/complaints`
   - Paginated list (`page`, `size`). Scoped: `RESIDENT` sees their active unit; `SOCIETY_ADMIN` sees their society.
 - `GET /api/v1/complaints/{id}`
@@ -132,6 +133,9 @@ Society Admin scope is resolved through the authenticated user ID and the `socie
 
 ### 3.7 Attachments
 - `POST /api/v1/complaints/{id}/attachments`
-  - Multipart upload for `IMAGE` (jpeg, png, webp <= 5MB) or `AUDIO` (mp3, wav, m4a, webm <= 10MB).
+  - Authenticated `RESIDENT` or `SOCIETY_ADMIN`; multipart field `file`. A resident must currently occupy the complaint's unit; an admin must be assigned to its society.
+  - JPEG, PNG, or WebP images up to 5 MiB; MP3, WAV, M4A, or WebM audio up to 10 MiB. Both declared MIME type and file signature are checked. Returns attachment metadata with 201.
+- `GET /api/v1/complaints/{id}/attachments`
+  - List attachment metadata for the authorized resident or assigned Society Admin.
 - `GET /api/v1/complaints/{id}/attachments/{attachmentId}`
-  - Stream/download authorized attachment.
+  - Download the authorized attachment. Files are stored outside the web root under `ATTACHMENT_STORAGE_PATH` (default `./var/private-attachments`) and streamed only through this authenticated endpoint.

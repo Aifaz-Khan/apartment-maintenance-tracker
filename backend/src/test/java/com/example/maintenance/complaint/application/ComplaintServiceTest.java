@@ -12,6 +12,7 @@ import com.example.maintenance.society.application.SocietyAccessService;
 import com.example.maintenance.society.domain.Society;
 import com.example.maintenance.user.domain.*;
 import com.example.maintenance.user.infrastructure.UserRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -26,7 +27,8 @@ class ComplaintServiceTest {
     private final ComplaintRepository complaints=mock(ComplaintRepository.class);
     private final ComplaintStatusHistoryRepository history=mock(ComplaintStatusHistoryRepository.class);
     private final SocietyAccessService access=mock(SocietyAccessService.class);
-    private final ComplaintService service=new ComplaintService(residencies,users,categories,complaints,history,access);
+    private final ApplicationEventPublisher events=mock(ApplicationEventPublisher.class);
+    private final ComplaintService service=new ComplaintService(residencies,users,categories,complaints,history,access,events);
 
     @Test void createsComplaintUsingServerResolvedResidentAndUnitContext(){
         Society society=society();ApartmentUnit unit=new ApartmentUnit(society,"A","101",1,null);unit.setId(5L);

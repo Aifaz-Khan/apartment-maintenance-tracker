@@ -3,6 +3,10 @@ spring:
     name: maintenance-tracker
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
+  servlet:
+    multipart:
+      max-file-size: ${MAX_FILE_SIZE:10MB}
+      max-request-size: ${MAX_REQUEST_SIZE:11MB}
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/maintenance_tracker}
     username: ${DB_USERNAME:maintenance_app}
@@ -19,6 +23,17 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS_ENABLE:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
 
 server:
   port: ${SERVER_PORT:8080}
@@ -47,3 +62,11 @@ app:
       enabled: ${SUPERADMIN_BOOTSTRAP_ENABLED:true}
     email: ${SUPERADMIN_EMAIL:superadmin@maintenancetracker.com}
     password: ${SUPERADMIN_PASSWORD:Admin@12345}
+  attachments:
+    storage-path: ${ATTACHMENT_STORAGE_PATH:./var/private-attachments}
+    max-image-bytes: ${IMAGE_MAX_FILE_SIZE_BYTES:5242880}
+    max-audio-bytes: ${AUDIO_MAX_FILE_SIZE_BYTES:10485760}
+  notifications:
+    email:
+      enabled: ${EMAIL_NOTIFICATIONS_ENABLED:false}
+      from: ${MAIL_FROM:noreply@maintenancetracker.com}

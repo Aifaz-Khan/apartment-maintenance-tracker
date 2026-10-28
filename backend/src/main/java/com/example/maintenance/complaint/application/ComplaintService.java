@@ -12,6 +12,8 @@ import com.example.maintenance.society.api.PageResponse;
 import com.example.maintenance.society.application.*;
 import com.example.maintenance.user.domain.*;
 import com.example.maintenance.user.infrastructure.UserRepository;
+import com.example.maintenance.notification.application.ComplaintSubmittedEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.*;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -40,11 +42,13 @@ public class ComplaintService {
     private final ComplaintRepository complaints;
     private final ComplaintStatusHistoryRepository history;
     private final SocietyAccessService societyAccess;
+    private final ApplicationEventPublisher events;
 
     public ComplaintService(UnitResidencyRepository residencies,UserRepository users,CategoryRepository categories,
-        ComplaintRepository complaints,ComplaintStatusHistoryRepository history,SocietyAccessService societyAccess){
+        ComplaintRepository complaints,ComplaintStatusHistoryRepository history,SocietyAccessService societyAccess,
+        ApplicationEventPublisher events){
         this.residencies=residencies;this.users=users;this.categories=categories;this.complaints=complaints;
-        this.history=history;this.societyAccess=societyAccess;
+        this.history=history;this.societyAccess=societyAccess;this.events=events;
     }
 
     @Transactional public ComplaintResponse create(Long residentId,ComplaintCreateRequest request){
@@ -68,6 +72,7 @@ public class ComplaintService {
             throw ex;
         }
         history.save(new ComplaintStatusHistory(complaint,resident,null,ComplaintStatus.SUBMITTED,"Complaint submitted."));
+        events.publishEvent(new ComplaintSubmittedEvent(complaint.getId()));
         return ComplaintResponse.from(complaint);
     }
 

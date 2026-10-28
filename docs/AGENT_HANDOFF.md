@@ -99,8 +99,8 @@ apartment-maintenance-tracker/
 - [x] **Phase 6 — Units, Resident Onboarding & Verification**: Building & unit creation, resident registration request, Society Admin approval workflow.
 - [x] **Phase 7 — Complaint Creation & One-Active-Complaint Rule**: Resident complaint creation, server-side context resolution, `409 ACTIVE_COMPLAINT_EXISTS` conflict handling.
 - [x] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
-- [ ] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/size validation, authorized streaming.
-- [ ] **Phase 10 — Email Notifications**: Society Admin email dispatcher on complaint submission.
+- [x] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/signature and size validation, authorized downloads.
+- [x] **Phase 10 — Email Notifications**: Optional asynchronous Society Admin email notifications after complaint submission.
 - [ ] **Phase 11 — Residency Transfer Workflow**: Residency transfer request, admin atomic approval.
 - [ ] **Phase 12 — Comments, Reopening, Dashboards & Reports**: Complaint discussion, reopening window, society-scoped metrics.
 - [ ] **Phase 13 — Hardening & Comprehensive Tests**: Integration test suite, Testcontainers.
@@ -122,6 +122,17 @@ apartment-maintenance-tracker/
 - New complaint creation records an initial `SUBMITTED` history item. No migration was needed because V1 already includes status-history and resolution fields.
 - The dashboard shows residents their requests and history; assigned Society Admins can update status and review history.
 
+### Phase 9 Private Attachments
+- Authenticated residents currently assigned to the complaint's unit and Society Admins assigned to its society may upload, list, and download files. Every operation repeats the complaint scope check server-side.
+- Local files use random UUID storage keys under `ATTACHMENT_STORAGE_PATH` (default `./var/private-attachments`), outside the frontend's public assets. The repository ignores this local data directory.
+- Accepted file types are JPEG/PNG/WebP up to 5 MiB and MP3/WAV/M4A/WebM up to 10 MiB. The service checks the declared MIME type and header signature; downloads use metadata from the database and set `X-Content-Type-Options: nosniff`.
+- Metadata remains in the existing V1 `complaint_attachments` table; no schema migration was required. The complaint screen supports adding and downloading attachments.
+
+### Phase 10 Email Notifications
+- Complaint submission publishes an event in the same database transaction. The notification listener runs asynchronously only after commit, then emails all active Society Admins assigned to that society.
+- Mail delivery is opt-in with `EMAIL_NOTIFICATIONS_ENABLED=true`; SMTP host, port, optional credentials, TLS, and sender are configured with `MAIL_*` environment variables. The default is disabled for local use.
+- Mail failures are logged and do not fail or roll back the complaint request. The email contains complaint ID, title, society, unit, category, priority, location, and description. Passwords are never sent by email.
+
 ### Phase 6 Units & Resident Verification
 - Society Admin unit routes require `SOCIETY_ADMIN` and compare the path society ID with the assigned society from `society_admins`; the client cannot select another tenant.
 - Public registration creates a BCrypt password hash, an inactive `RESIDENT` user and a `PENDING` `UnitResidency`. The requested unit must belong to the stated active society.
@@ -130,7 +141,7 @@ apartment-maintenance-tracker/
 
 ### Phase 5 Society Management & Tenant Scope
 - Super Admin APIs at `/api/v1/super-admin/societies` provide paginated list, detail, create, partial update/status control, and Society Admin appointment. All routes require `ROLE_SUPER_ADMIN`.
-- Admin appointment creates a BCrypt protected `SOCIETY_ADMIN` account and a `society_admins` mapping in one transaction; duplicate account emails are rejected. Initial credentials are supplied through the protected Super Admin route and must be shared securely. Email invitation delivery is deferred to Phase 10.
+- Admin appointment creates a BCrypt protected `SOCIETY_ADMIN` account and a `society_admins` mapping in one transaction; duplicate account emails are rejected. Initial credentials are supplied through the protected Super Admin route and must be shared securely; passwords are never sent by email.
 - `SocietyAccessService` resolves a Society Admin's assigned society from the authenticated user mapping and rejects any mismatched society ID. Future tenant-owned endpoints should use this service for all reads and writes.
 - Deactivation sets society status to `INACTIVE`; it preserves society data and assignments.
 

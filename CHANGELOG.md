@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.0] - 2026-10-28
+
+### Added
+- **Phase 10: Email Notifications**
+  - Optional asynchronous email alerts to active Society Admins after complaint submission commits
+  - SMTP, sender, authentication, and STARTTLS environment configuration
+  - Mail delivery failure handling that does not interrupt complaint submission
+
+## [0.9.0] - 2026-10-27
+
+### Added
+- **Phase 9: Private Complaint Attachments**
+  - Authenticated upload, listing, and download for complaint images and audio
+  - Private local file storage with randomized keys and database metadata
+  - MIME type, file signature, request size, and per-media size validation
+  - Resident unit and Society Admin tenant checks for every attachment operation
+  - Simple complaint screen controls to add and download files
+
 ## [0.8.0] - 2026-10-27
 
 ### Added
