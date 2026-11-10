@@ -97,11 +97,15 @@ Society Admin scope is resolved through the authenticated user ID and the `socie
 - `PATCH /api/v1/admin/resident-requests/{id}`
   - Body: `{ "action": "APPROVE" | "REJECT", "rejectionReason": "required when rejecting" }`. Approval activates the account and residency; a unit with an existing active residency cannot be approved. Role: `SOCIETY_ADMIN`; request's society is checked server-side.
 - `POST /api/v1/residency-transfers`
-  - Initiate residency transfer request. Role: `RESIDENT` or `SOCIETY_ADMIN`.
+  - Body: `{ "targetApartmentUnitId": 12, "effectiveDate": "2026-11-01", "reason": "..." }`. A resident requests moving their active residency to a vacant unit in the same society; resident and current residency are taken from the authenticated user.
+- `GET /api/v1/residency-transfers/available-units?page=0&size=100`
+  - Lists vacant units in the resident's society, excluding their current unit and units with pending transfers.
+- `GET /api/v1/residency-transfers?page=0&size=20`
+  - Lists the authenticated resident's transfer requests and decisions.
 - `GET /api/v1/admin/residency-transfers`
-  - List transfer requests. Role: `SOCIETY_ADMIN`.
+  - Lists pending transfers in the authenticated Society Admin's assigned society.
 - `PATCH /api/v1/admin/residency-transfers/{id}`
-  - Approve or reject transfer. Role: `SOCIETY_ADMIN`.
+  - Body: `{ "action": "APPROVE" | "REJECT", "rejectionReason": "required when rejecting" }`. Role: `SOCIETY_ADMIN`; request society is checked server-side. Approval is allowed on or after the effective date and atomically ends the old residency and activates the new one.
 
 ### 3.5 Categories
 - `GET /api/v1/categories`

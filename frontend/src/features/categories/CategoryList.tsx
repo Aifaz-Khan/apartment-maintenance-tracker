@@ -49,7 +49,7 @@ export const CategoryList: React.FC = () => {
   const totalCount = categories?.length ?? 0;
 
   return (
-    <div className="section-panel" style={{ marginTop: '1rem' }}>
+    <div className="section-panel" id="maintenance-categories">
       {/* Panel Action Bar */}
       <div className="panel-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>

@@ -101,7 +101,7 @@ apartment-maintenance-tracker/
 - [x] **Phase 8 — Society Admin Complaint Management & Status History**: Status transition map enforcement, audit history persistence, resolution notes.
 - [x] **Phase 9 — Private Attachments (Image & Audio)**: Local private storage abstraction, MIME/signature and size validation, authorized downloads.
 - [x] **Phase 10 — Email Notifications**: Optional asynchronous Society Admin email notifications after complaint submission.
-- [ ] **Phase 11 — Residency Transfer Workflow**: Residency transfer request, admin atomic approval.
+- [x] **Phase 11 — Residency Transfer Workflow**: Resident requests an intra-society move; Society Admin approval atomically changes the active residency.
 - [ ] **Phase 12 — Comments, Reopening, Dashboards & Reports**: Complaint discussion, reopening window, society-scoped metrics.
 - [ ] **Phase 13 — Hardening & Comprehensive Tests**: Integration test suite, Testcontainers.
 - [ ] **Phase 14 — CI/CD & Cloud Deployment**: GitHub Actions, Neon PostgreSQL, Vercel & Render.
@@ -132,6 +132,12 @@ apartment-maintenance-tracker/
 - Complaint submission publishes an event in the same database transaction. The notification listener runs asynchronously only after commit, then emails all active Society Admins assigned to that society.
 - Mail delivery is opt-in with `EMAIL_NOTIFICATIONS_ENABLED=true`; SMTP host, port, optional credentials, TLS, and sender are configured with `MAIL_*` environment variables. The default is disabled for local use.
 - Mail failures are logged and do not fail or roll back the complaint request. The email contains complaint ID, title, society, unit, category, priority, location, and description. Passwords are never sent by email.
+
+### Phase 11 Residency Transfers
+- Residents can request a move from their current active unit to a vacant unit in the same society. The server derives the resident and current residency; the target unit, effective date, and reason are the only client-provided fields.
+- Available unit results exclude occupied units, pending transfer targets, and the resident's current unit. Partial unique indexes in V3 guard against concurrent pending requests for the same resident or target unit.
+- Assigned Society Admins see pending requests only in their society. Approval is permitted on/after the effective date, locks the request and target unit, rechecks the current residency and vacancy, then ends the old residency and creates the new ACTIVE residency in one transaction. Rejection requires a reason.
+- No credentials or new account are created by this flow; it transfers the authenticated resident's own residency.
 
 ### Phase 6 Units & Resident Verification
 - Society Admin unit routes require `SOCIETY_ADMIN` and compare the path society ID with the assigned society from `society_admins`; the client cannot select another tenant.

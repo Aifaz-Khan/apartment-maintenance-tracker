@@ -104,6 +104,8 @@ Audit log and approval workflow for residency transfers.
 - `created_at` (TIMESTAMPTZ NOT NULL DEFAULT NOW())
 - `updated_at` (TIMESTAMPTZ NOT NULL DEFAULT NOW())
 
+Migration V3 adds partial unique indexes so each resident and target unit can have at most one `PENDING` transfer at a time.
+
 ### 2.7 `complaint_categories`
 Maintenance categories (plumbing, electrical, elevator, etc.).
 - `id` (BIGSERIAL PRIMARY KEY)

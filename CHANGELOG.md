@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0] - 2026-10-31
+
+### Added
+- **Phase 11: Residency Transfers**
+  - Residents can request a move to a vacant unit in their current society and track request decisions
+  - Society Admin transfer queue with scoped approval and rejection reasons
+  - Atomic residency switch on approval, with effective-date checks and vacancy revalidation
+  - Database guards preventing duplicate pending transfer requests per resident or target unit
+
 ## [1.0.0] - 2026-10-28
 
 ### Added
